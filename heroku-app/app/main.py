@@ -2,29 +2,16 @@ import pickle
 import numpy as np
 from flask import Flask, request
 
-model = None
-scaler_X = None
-scaler_y = None
 app = Flask(__name__)
-
-
-def load_model_and_scalers():
-    global model
-    # model variable refers to the global variable
-    with open('admissions_rf.pkl', 'rb') as f:
-        model = pickle.load(f)
-    global scaler_X
-    with open('scaler_X.pkl', 'rb') as f:
-        scaler_X = pickle.load(f)
-    global scaler_y
-    with open('scaler_y.pkl', 'rb') as f:
-        scaler_y = pickle.load(f)
-
 
 @app.route('/', methods=['POST'])
 def get_prediction():
     # Works only for a single sample
     if request.method == 'POST':
+        model = pickle.load(open('app/admissions_rf.pkl', 'rb'))
+        scaler_X = pickle.load(open('app/scaler_X.pkl', 'rb'))
+        scaler_y = pickle.load(open('app/scaler_y.pkl', 'rb'))
+        
         data = request.get_json()  # Get data posted as a json
         data = np.array(data)[np.newaxis, :]  # converts shape from (7,) to (1, 7)
         data = scaler_X.transform(data) # scale the input
